@@ -9,4 +9,4 @@ export const authRoutes =[
 
 export const apiAuthPrefix ="/api/auth"
 
-export const defaultRedirect ="/admin"
+export const defaultRedirect ="/"
