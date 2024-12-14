@@ -10,7 +10,6 @@ import { Navbar } from './(public)/components/Navbar'
 import { Footer } from './(public)/components/Footer'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 import { useMediaQuery } from '@mui/material';
-import { env } from '@/actions/console_env'
 
 const slides = [
   { image: '/slide1.png', text: 'Excellence académique' },
@@ -54,7 +53,6 @@ export default function Home() {
   }, [currentIndexCollaboration,currentIndexFormation])
 
   const handleNextCollaboration = () => {
-    env().then()
     setCurrentIndexCollaboration((prevIndex) => (prevIndex + 1) % collaborations.length);
   };
 

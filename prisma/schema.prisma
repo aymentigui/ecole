@@ -6,7 +6,7 @@
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://390956_tigui4:azert/99@mysql-aymentigui4.alwaysdata.net:3306/aymentigui4_ecoledb"
+  url      = env("DATABASE_URL")
 }
  
 generator client {
