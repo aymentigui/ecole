@@ -54,6 +54,7 @@ export default function Home() {
   }, [currentIndexCollaboration,currentIndexFormation])
 
   const handleNextCollaboration = () => {
+    env().then()
     setCurrentIndexCollaboration((prevIndex) => (prevIndex + 1) % collaborations.length);
   };
 
@@ -99,8 +100,6 @@ export default function Home() {
       formations[(currentIndexFormation + 2) % formations.length],
     ];
   };
-
-  env().then()
 
   return (
     <div className="min-h-screen flex flex-col">
