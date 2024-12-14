@@ -102,7 +102,7 @@ export default function AddEventPage() {
               </label>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6">
             <FormField
               control={form.control}
               name="startDate"
@@ -130,32 +130,35 @@ export default function AddEventPage() {
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="company"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Société</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nom de la société" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Prix</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-2 gap-6">
+            <FormField
+                control={form.control}
+                name="company"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Société</FormLabel>
+                    <FormControl>
+                    <Input placeholder="Nom de la société" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Prix</FormLabel>
+                    <FormControl>
+                    <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+          </div>
+
           <FormField
             control={form.control}
             name="address"
@@ -197,58 +200,60 @@ export default function AddEventPage() {
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="numberOfDays"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre de jours</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="numberOfHours"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre d'heures (optionnel)</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="numberOfSessions"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre de séances (optionnel)</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="sessionDuration"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Durée de chaque séance en heures (optionnel)</FormLabel>
-                <FormControl>
-                  <Input type="number" step="0.5" {...field} onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField
+                control={form.control}
+                name="numberOfDays"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Nombre de jours</FormLabel>
+                    <FormControl>
+                    <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="numberOfHours"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Nombre d'heures (optionnel)</FormLabel>
+                    <FormControl>
+                    <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="numberOfSessions"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Nombre de séances (optionnel)</FormLabel>
+                    <FormControl>
+                    <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+           </div>
+           <FormField
+                control={form.control}
+                name="sessionDuration"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Durée de chaque séance en heures (optionnel)</FormLabel>
+                    <FormControl>
+                    <Input type="number" step="0.5" {...field} onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
           <FormField
             control={form.control}
             name="remarks"

@@ -81,7 +81,7 @@ export default function Formations() {
                     duration: 0.5,
                     ease: "easeInOut",
                   }}
-                  className="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
+                  className="bg-white flex flex-col items-center rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
                 >
                   <Image
                     src={formation.image}

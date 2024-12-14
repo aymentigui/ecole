@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Navbar } from './(public)/components/Navbar'
 import { Footer } from './(public)/components/Footer'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
+import { useMediaQuery } from '@mui/material';
 
 const slides = [
   { image: '/slide1.png', text: 'Excellence académique' },
@@ -35,6 +36,7 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentIndexCollaboration, setCurrentIndexCollaboration] = useState(0);
   const [currentIndexFormation, setCurrentIndexFormation] = useState(0);
+  const isSmallScreen = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -73,6 +75,10 @@ export default function Home() {
   };
 
   const getVisibleItemsCollaborations = () => {
+    if (isSmallScreen) {
+      return [collaborations[currentIndexCollaboration],];
+    }
+
     return [
       collaborations[currentIndexCollaboration],
       collaborations[(currentIndexCollaboration + 1) % collaborations.length],
@@ -81,6 +87,11 @@ export default function Home() {
   };
 
   const getVisibleItemsFormations = () => {
+
+    if (isSmallScreen) {
+      return [formations[currentIndexFormation]];
+    }
+
     return [
       formations[currentIndexFormation],
       formations[(currentIndexFormation + 1) % formations.length],
@@ -120,7 +131,7 @@ export default function Home() {
                   {getVisibleItemsCollaborations().map((collab, index) => (
                     <motion.div
                       key={index}
-                      className="bg-white rounded-lg shadow-md overflow-hidden"
+                      className="bg-white flex flex-col items-center rounded-lg shadow-md overflow-hidden"
                       initial={{ opacity: 0, y: 50 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -50 }}
@@ -170,7 +181,7 @@ export default function Home() {
                   {getVisibleItemsFormations().map((formation, index) => (
                     <motion.div
                       key={index}
-                      className="bg-white rounded-lg shadow-md overflow-hidden"
+                      className="bg-white flex flex-col items-center rounded-lg shadow-md overflow-hidden"
                       initial={{ opacity: 0, y: 50 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -50 }}
