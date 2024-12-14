@@ -34,10 +34,10 @@ export default function About() {
             >
               <h2 className="text-2xl font-semibold mb-4">Notre histoire</h2>
               <p className="mb-4">
-                Fondée il y a plus de 20 ans, notre école de formation s'est toujours efforcée de fournir une éducation de qualité et innovante. Nous avons commencé avec une petite équipe passionnée et avons grandi pour devenir l'un des leaders de la formation professionnelle en France.
+                {"Fondée il y a plus de 20 ans, notre école de formation s'est toujours efforcée de fournir une éducation de qualité et innovante. Nous avons commencé avec une petite équipe passionnée et avons grandi pour devenir l'un des leaders de la formation professionnelle en France."}
               </p>
               <p>
-                Notre mission est de préparer nos étudiants aux défis du monde professionnel en leur offrant des formations adaptées aux besoins du marché et en constante évolution.
+                {"Notre mission est de préparer nos étudiants aux défis du monde professionnel en leur offrant des formations adaptées aux besoins du marché et en constante évolution."}
               </p>
             </motion.div>
           </div>

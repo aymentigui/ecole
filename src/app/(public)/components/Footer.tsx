@@ -8,7 +8,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <Image src="/logo.png" alt="Logo" width={60} height={60} />
-            <p className="mt-2">Notre école de formation s'engage à fournir une éducation de qualité depuis plus de 20 ans.</p>
+            <p className="mt-2">{"Notre école de formation s'engage à fournir une éducation de qualité depuis plus de 20 ans."}</p>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-4">Liens rapides</h3>

@@ -230,9 +230,9 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-8">À propos de notre école</h2>
             <p className="text-lg text-center mb-8">
-              Notre école de formation s'engage à fournir une éducation de qualité depuis plus de 20 ans. 
+              {`Notre école de formation s'engage à fournir une éducation de qualité depuis plus de 20 ans. 
               Nous nous efforçons de préparer nos étudiants aux défis du monde professionnel en leur offrant 
-              des formations innovantes et adaptées aux besoins du marché.
+              des formations innovantes et adaptées aux besoins du marché.`}
             </p>
           </div>
         </section>

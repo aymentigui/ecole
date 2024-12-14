@@ -7,9 +7,10 @@ import { z } from 'zod'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { eventSchema } from '@/util/schema/events'
-import { Image } from 'lucide-react'
+import { Image as ImageLucide } from 'lucide-react'
+import Image from 'next/image';
 
 type EventFormValues = z.infer<typeof eventSchema>
 
@@ -75,7 +76,7 @@ export default function AddEventPage() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom de l'événement</FormLabel>
+                <FormLabel>{"Nom de l'événement"}</FormLabel>
                 <FormControl>
                   <Input placeholder="Nom de l'événement" {...field} />
                 </FormControl>
@@ -84,15 +85,15 @@ export default function AddEventPage() {
             )}
           />
            <div className="space-y-4">
-            <FormLabel>Photo de l'événement</FormLabel>
+            <FormLabel>{"Photo de l'événement"}</FormLabel>
             <div className="flex items-center gap-4">
               {previewImage && (
                 <div className="w-32 h-32 border rounded-lg overflow-hidden flex"> 
-                  <img src={previewImage} alt="Prévisualisation" className="h-full object-contain" />
+                  <Image src={previewImage} alt="Prévisualisation" className="h-full object-contain" />
                 </div>
               )}
               <label className="flex flex-col items-center justify-center w-32 h-32 border rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-200">
-                <span className="text-gray-500"><Image /></span>
+                <span className="text-gray-500"><ImageLucide /></span>
                 <input
                   type="file"
                   accept="image/*"
@@ -219,7 +220,7 @@ export default function AddEventPage() {
                 name="numberOfHours"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Nombre d'heures (optionnel)</FormLabel>
+                    <FormLabel>{"Nombre d'heures (optionnel)"}</FormLabel>
                     <FormControl>
                     <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} />
                     </FormControl>
