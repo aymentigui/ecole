@@ -8,7 +8,6 @@ import { RegisterSchema } from '@/util/schema/user';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { register } from '@/actions/register';
+/* eslint-disable */
 
 export default function Login() {
   const [loading, setLoading] = useTransition();

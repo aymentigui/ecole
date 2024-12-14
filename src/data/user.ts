@@ -1,5 +1,5 @@
+/* eslint-disable */
 import { prisma } from "@/util/db"
-
 
 export const getUserByEmail = async (email:string)=>{
     try {

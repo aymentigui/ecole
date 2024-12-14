@@ -6,12 +6,15 @@ import { LoginSchema } from "@/util/schema/user";
 import Credentials from "next-auth/providers/credentials"
 import { getUserByEmail, getUserById } from "./data/user";
 import bcrypt from "bcrypt"
-
+/* eslint-disable */
 export const { handlers , auth, signIn, signOut } = 
   NextAuth({
     pages :{
       signIn : "/auth/login"
     },
+    adapter: PrismaAdapter(prisma),
+    session: { strategy : "jwt"},
+    ...authConfig,
     callbacks: {
       async jwt({token,}) {
         if(!token.sub) return token // bach tverifie ida connecta

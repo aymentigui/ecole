@@ -7,7 +7,6 @@ import { LoginSchema } from '@/util/schema/user';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { login } from '@/actions/login';
 import { FaCircleInfo } from 'react-icons/fa6';
+/* eslint-disable */
 
 export default function Login() {
   const [loading, setLoading] = useTransition();

@@ -1,9 +1,7 @@
 "use server"
 
-import { prisma } from "@/util/db"
 import { LoginSchema } from "@/util/schema/user"
 import { z } from "zod"
-import bcrypt from "bcrypt"
 import { signIn } from "@/auth"
 import { defaultRedirect } from "@/routes"
 import { AuthError } from "next-auth"
