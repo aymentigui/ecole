@@ -14,7 +14,6 @@ export const { handlers , auth, signIn, signOut } =
     },
     adapter: PrismaAdapter(prisma),
     session: { strategy : "jwt"},
-    ...authConfig,
     callbacks: {
       async jwt({token,}) {
         if(!token.sub) return token // bach tverifie ida connecta
@@ -51,6 +50,7 @@ export const { handlers , auth, signIn, signOut } =
         */
         return true
       },
+      ...authConfig,
     },
     providers: [
       Credentials({

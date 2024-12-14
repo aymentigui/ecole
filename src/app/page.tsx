@@ -10,6 +10,7 @@ import { Navbar } from './(public)/components/Navbar'
 import { Footer } from './(public)/components/Footer'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 import { useMediaQuery } from '@mui/material';
+import { env } from '@/actions/console_env'
 
 const slides = [
   { image: '/slide1.png', text: 'Excellence académique' },
@@ -98,6 +99,8 @@ export default function Home() {
       formations[(currentIndexFormation + 2) % formations.length],
     ];
   };
+
+  env().then()
 
   return (
     <div className="min-h-screen flex flex-col">
