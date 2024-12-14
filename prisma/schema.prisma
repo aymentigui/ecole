@@ -52,7 +52,7 @@ model user {
   emailVerified DateTime?
   image         String?
   createdAt     DateTime        @default(now())
-  updatedAt     DateTime
+  updatedAt     DateTime?
   account       account?
   authenticator authenticator[]
 }
