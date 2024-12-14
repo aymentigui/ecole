@@ -1,3 +1,8 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "no-console": "off",  // Disable the 'no-console' rule
+    "semi": ["error", "always"],  // Enable semi-colons rule
+    "quotes": ["error", "double"],  // Enforce double quotes
+  }
 }

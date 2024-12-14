@@ -36,8 +36,10 @@ export const { handlers , auth, signIn, signOut } =
 
         return session
       },
-      async signIn({user,}) {
+      async signIn({user}) {
         // tendar avant matendar authentification
+        if(!user || !user.id)
+          return false
         const existinUser=await getUserById(user.id)
         console.log(user)
         /*
