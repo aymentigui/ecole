@@ -10,67 +10,13 @@ import { Navbar } from './(public)/components/Navbar'
 import { Footer } from './(public)/components/Footer'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 import { useMediaQuery } from '@mui/material';
+import Link from 'next/link'
+import { collaborations, formations } from '@/util/data'
 
 const slides = [
   { image: '/slide1.png', text: 'Excellence académique' },
   { image: '/slide2.png', text: 'Innovation pédagogique' },
   { image: '/slide3.png', text: 'Accompagnement personnalisé' },
-]
-
-const collaborations = [
-  { 
-    image: '/formation.png', 
-    name: 'TechCorp', 
-    compagne: 'Campagne de stages', 
-    description: 'Partenariat pour des stages en entreprise', 
-    dateDebut: '2024-01-01', 
-    dateFin: '2024-12-31', 
-    prix: 5000 
-  },
-  { 
-    image: '/logo.png', 
-    name: 'EduSoft', 
-    compagne: 'Logiciels éducatifs', 
-    description: 'Développement de logiciels éducatifs', 
-    dateDebut: '2024-03-01', 
-    dateFin: '2024-08-31', 
-    prix: 7000 
-  },
-  { 
-    image: '/formation.png', 
-    name: 'FormaPro', 
-    compagne: 'Formation professionnelle', 
-    description: 'Échanges d\'expertise en formation professionnelle', 
-    dateDebut: '2024-02-01', 
-    dateFin: '2024-11-30', 
-    prix: 4500 
-  },
-  { 
-    image: '/logo.png', 
-    name: 'EduSoft1', 
-    compagne: 'Logiciels éducatifs avancés', 
-    description: 'Développement de logiciels éducatifs', 
-    dateDebut: '2024-05-01', 
-    dateFin: '2024-10-31', 
-    prix: 8000 
-  },
-  { 
-    image: '/formation.png', 
-    name: 'EduSoft2', 
-    compagne: 'Projets éducatifs innovants', 
-    description: 'Développement de logiciels éducatifs', 
-    dateDebut: '2024-04-01', 
-    dateFin: '2024-09-30', 
-    prix: 6000 
-  }
-];
-
-
-const formations = [
-  { image: '/formation.png', name: 'Développement Web', dateDebut: '01/09/2023', dateFin: '31/12/2023', prix: '3500', description: 'Formation complète en développement web front-end et back-end' },
-  { image: '/logo.png', name: 'Data Science', dateDebut: '15/10/2023', dateFin: '15/03/2024', prix: '4500', description: 'Maîtrisez l\'analyse de données et le machine learning' },
-  { image: '/formation.png', name: 'UX/UI', dateDebut: '01/11/2023', dateFin: '28/02/2024', prix: '3000', description: 'Apprenez à créer des interfaces utilisateur intuitives et esthétiques' },
-  { image: '/logo.png', name: 'Design UX/UI', dateDebut: '01/11/2023', dateFin: '28/02/2024', prix: '3000', description: 'Apprenez à créer des interfaces utilisateur intuitives et esthétiques' },
 ]
 
 export default function Home() {
@@ -177,24 +123,25 @@ export default function Home() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -50 }}
                       transition={{ duration: 0.5 }}
-                    >
-                      <Image
-                        src={collab.image}
+                    ><Link href={`/collaborations/${collab.id}`}>
+                      {collab.photo && <Image
+                        src={collab.photo}
                         quality={50}
                         alt={collab.name}
                         width={400}
                         height={200}
                         objectFit="cover"
-                      />
+                      />}
                       <div className="p-4">
                         <h3 className="font-semibold text-xl mb-2">{collab.name}</h3>
-                        <p className="text-sm text-gray-600 italic mb-2">{collab.compagne}</p>
+                        <p className="text-sm text-gray-600 italic mb-2">{collab.company}</p>
                         <p className="text-sm text-gray-600 mb-2">
-                          Du {collab.dateDebut} au {collab.dateFin}
+                          Du {collab.startDate.toLocaleDateString()} au {collab.endDate.toLocaleDateString()}
                         </p>
-                        <p className="font-bold text-lg mb-2">{collab.prix + ".00 DA"}</p>
-                        <p>{collab.description}</p>
+                        <p className="font-bold text-lg mb-2">{collab.price + ".00 DA"}</p>
+                        <p>{collab.remarks}</p>
                       </div>
+                    </Link>
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -234,23 +181,24 @@ export default function Home() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -50 }}
                       transition={{ duration: 0.5 }}
-                    >
-                      <Image
-                        src={formation.image}
+                    ><Link href={`/formations/${formation.id}`}>
+                      {formation.photo&& <Image
+                        src={formation.photo}
                         quality={50}
                         alt={formation.name}
                         width={400}
                         height={200}
                         objectFit="cover"
-                      />
+                      />}
                       <div className="p-4">
                         <h3 className="font-semibold text-xl mb-2">{formation.name}</h3>
                         <p className="text-sm text-gray-600 mb-2">
-                          Du {formation.dateDebut} au {formation.dateFin}
+                          Du {formation.startDate.toLocaleDateString()} au {formation.endDate.toLocaleDateString()}
                         </p>
-                        <p className="font-bold text-lg mb-2">{formation.prix+".00 DA"}</p>
-                        <p>{formation.description}</p>
+                        <p className="font-bold text-lg mb-2">{formation.price+".00 DA"}</p>
+                        <p>{formation.remarks}</p>
                       </div>
+                    </Link>
                     </motion.div>
                   ))}
                 </AnimatePresence>

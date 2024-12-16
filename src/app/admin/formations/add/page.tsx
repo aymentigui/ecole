@@ -9,25 +9,24 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { collaborationSchema } from '@/util/schema/events'
 import { ImageIcon as ImageLucide, Calendar, Building2, DollarSign, MapPin, Phone, Clock } from 'lucide-react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { formationSchema } from '@/util/schema/formation'
 
-type EventFormValues = z.infer<typeof collaborationSchema>
+type FormationFormValues = z.infer<typeof formationSchema>
 
-export default function AddEventPage() {
+export default function AddFormationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
 
-  const form = useForm<EventFormValues>({
-    resolver: zodResolver(collaborationSchema),
+  const form = useForm<FormationFormValues>({
+    resolver: zodResolver(formationSchema),
     defaultValues: {
       name: '',
       photo: '',
       startDate: new Date(),
       endDate: new Date(),
-      company: '',
       price: 0,
       address: '',
       phone1: '',
@@ -40,17 +39,17 @@ export default function AddEventPage() {
     },
   })
 
-  async function onSubmit(data: EventFormValues) {
+  async function onSubmit(data: FormationFormValues) {
     setIsSubmitting(true)
     try {
       console.log(data)
       await new Promise(resolve => setTimeout(resolve, 1000))
-      alert('Événement ajouté avec succès !')
+      alert('Formation ajouté avec succès !')
       form.reset()
       setPreviewImage(null)
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de l\'événement:', error)
-      alert('Une erreur est survenue lors de l\'ajout de l\'événement.')
+      console.error('Erreur lors de l\'ajout de la formation:', error)
+      alert('Une erreur est survenue lors de l\'ajout de la formation.')
     } finally {
       setIsSubmitting(false)
     }
@@ -72,7 +71,7 @@ export default function AddEventPage() {
     <div className="container max-w-4xl mx-auto px-4 py-8">
       <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6">
-          <CardTitle className="text-3xl font-bold">Ajouter un événement</CardTitle>
+          <CardTitle className="text-3xl font-bold">Ajouter une formation</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <Form {...form}>
@@ -82,9 +81,9 @@ export default function AddEventPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg font-semibold">Nom de l'événement</FormLabel>
+                    <FormLabel className="text-lg font-semibold">Nom de la formation</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nom de l'événement" {...field} className="border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                      <Input placeholder="Nom de la formation" {...field} className="border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -115,7 +114,7 @@ export default function AddEventPage() {
               </div>
 
               <div className="space-y-4">
-                <FormLabel className="text-lg font-semibold">Photo de l'événement</FormLabel>
+                <FormLabel className="text-lg font-semibold">Photo de la formation</FormLabel>
                 <div className="flex items-center gap-4">
                   {previewImage ? (
                     <div className="w-32 h-32 border-2 border-purple-500 rounded-lg overflow-hidden flex">
@@ -176,22 +175,6 @@ export default function AddEventPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="company"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg font-semibold">Société</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input placeholder="Nom de la société" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="price"
                   render={({ field }) => (
                     <FormItem>
@@ -217,7 +200,7 @@ export default function AddEventPage() {
                     <FormControl>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <Input placeholder="Adresse de l'événement" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                        <Input placeholder="Adresse de la formation" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -347,7 +330,7 @@ export default function AddEventPage() {
                 disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-md hover:from-purple-600 hover:to-pink-600 transition duration-300"
               >
-                {isSubmitting ? 'Ajout en cours...' : 'Ajouter l\'événement'}
+                {isSubmitting ? 'Ajout en cours...' : 'Ajouter la formation'}
               </Button>
             </form>
           </Form>

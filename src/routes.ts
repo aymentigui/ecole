@@ -1,5 +1,5 @@
 export const publicRoutes =[
-    "/","/a-propos","/contact","/formations","/collaborations"
+    "/","/a-propos","/contact","/formations","/collaborations","/collaborations/[id]",
 ]
 
 export const authRoutes =[

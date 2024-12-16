@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -16,41 +16,62 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type EventFormValues = z.infer<typeof collaborationSchema>
 
-export default function AddEventPage() {
+// Simuler le chargement des données de l'événement
+const fetchEventData = async (id: string): Promise<EventFormValues> => {
+  // Ici, vous feriez normalement un appel API pour récupérer les données de l'événement
+  await new Promise(resolve => setTimeout(resolve, 1000)) // Simuler un délai réseau
+  return {
+    name: 'Événement Exemple',
+    photo: '/logo.png' as string,
+    startDate: new Date('2023-12-01'),
+    endDate: new Date('2023-12-03'),
+    company: 'Entreprise ABC',
+    price: 100,
+    address: '123 Rue Exemple, Ville, Pays',
+    phone1: '0123456789',
+    phone2: '9876543210',
+    numberOfDays: 3,
+    numberOfHours: 24,
+    numberOfSessions: 6,
+    sessionDuration: 4,
+    remarks: 'Ceci est un exemple de remarques pour l\'événement.',
+    isRegistrationAllowed: true,
+  }
+}
+
+export default function EditEventPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = use(paramsPromise);
+  const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(collaborationSchema),
-    defaultValues: {
-      name: '',
-      photo: '',
-      startDate: new Date(),
-      endDate: new Date(),
-      company: '',
-      price: 0,
-      address: '',
-      phone1: '',
-      phone2: '',
-      numberOfDays: 1,
-      numberOfHours: undefined,
-      numberOfSessions: undefined,
-      sessionDuration: undefined,
-      remarks: '',
+    defaultValues: async () => {
+      setIsLoading(true)
+      const data = await fetchEventData(params.id)
+      if(data.photo)
+        setPreviewImage(data.photo)
+      setIsLoading(false)
+      return data
     },
   })
+
+  useEffect(() => {
+    if (form.formState.isDirty) {
+      form.reset(form.getValues())
+    }
+  }, [form])
 
   async function onSubmit(data: EventFormValues) {
     setIsSubmitting(true)
     try {
       console.log(data)
       await new Promise(resolve => setTimeout(resolve, 1000))
-      alert('Événement ajouté avec succès !')
-      form.reset()
-      setPreviewImage(null)
+      alert('Événement mis à jour avec succès !')
     } catch (error) {
-      console.error('Erreur lors de l\'ajout de l\'événement:', error)
-      alert('Une erreur est survenue lors de l\'ajout de l\'événement.')
+      console.error('Erreur lors de la mise à jour de l\'événement:', error)
+      alert('Une erreur est survenue lors de la mise à jour de l\'événement.')
     } finally {
       setIsSubmitting(false)
     }
@@ -68,11 +89,15 @@ export default function AddEventPage() {
     }
   }
 
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Chargement...</div>
+  }
+
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
       <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6">
-          <CardTitle className="text-3xl font-bold">Ajouter un événement</CardTitle>
+        <CardHeader className="bg-gradient-to-r from-blue-500 to-teal-500 text-white p-6">
+          <CardTitle className="text-3xl font-bold">Modifier l'événement</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <Form {...form}>
@@ -84,7 +109,7 @@ export default function AddEventPage() {
                   <FormItem>
                     <FormLabel className="text-lg font-semibold">Nom de l'événement</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nom de l'événement" {...field} className="border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                      <Input placeholder="Nom de l'événement" {...field} className="border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,7 +143,7 @@ export default function AddEventPage() {
                 <FormLabel className="text-lg font-semibold">Photo de l'événement</FormLabel>
                 <div className="flex items-center gap-4">
                   {previewImage ? (
-                    <div className="w-32 h-32 border-2 border-purple-500 rounded-lg overflow-hidden flex">
+                    <div className="w-32 h-32 border-2 border-blue-500 rounded-lg overflow-hidden flex">
                       <Image src={previewImage} alt="Prévisualisation" width={128} height={128} className="object-cover" />
                     </div>
                   ) : (
@@ -126,8 +151,8 @@ export default function AddEventPage() {
                       <ImageLucide size={48} />
                     </div>
                   )}
-                  <label className="flex items-center justify-center px-4 py-2 bg-purple-500 text-white rounded-md cursor-pointer hover:bg-purple-600 transition duration-300">
-                    <span>Choisir une image</span>
+                  <label className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-600 transition duration-300">
+                    <span>Changer l'image</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -148,7 +173,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -164,7 +189,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -183,7 +208,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input placeholder="Nom de la société" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input placeholder="Nom de la société" {...field} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -199,7 +224,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -217,7 +242,7 @@ export default function AddEventPage() {
                     <FormControl>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <Input placeholder="Adresse de l'événement" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                        <Input placeholder="Adresse de l'événement" {...field} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -235,7 +260,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input placeholder="0556772333" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input placeholder="0556772333" {...field} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -251,7 +276,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input placeholder="0556772333" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input placeholder="0556772333" {...field} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -270,7 +295,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -286,7 +311,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -302,7 +327,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -320,7 +345,7 @@ export default function AddEventPage() {
                     <FormControl>
                       <div className="relative">
                         <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <Input type="number" step="0.5" {...field} onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                        <Input type="number" step="0.5" {...field} onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -335,7 +360,7 @@ export default function AddEventPage() {
                   <FormItem>
                     <FormLabel className="text-lg font-semibold">Remarques (optionnel)</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Remarques supplémentaires" {...field} className="border-2 border-gray-300 focus:border-purple-500 rounded-md p-2 min-h-[100px]" />
+                      <Textarea placeholder="Remarques supplémentaires" {...field} className="border-2 border-gray-300 focus:border-blue-500 rounded-md p-2 min-h-[100px]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -345,9 +370,9 @@ export default function AddEventPage() {
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-md hover:from-purple-600 hover:to-pink-600 transition duration-300"
+                className="w-full bg-gradient-to-r from-blue-500 to-teal-500 text-white py-2 px-4 rounded-md hover:from-blue-600 hover:to-teal-600 transition duration-300"
               >
-                {isSubmitting ? 'Ajout en cours...' : 'Ajouter l\'événement'}
+                {isSubmitting ? 'Mise à jour en cours...' : 'Mettre à jour l\'événement'}
               </Button>
             </form>
           </Form>

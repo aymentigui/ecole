@@ -1,21 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { formations } from "@/util/data";
-import SearchBar from "../components/table/searchBar-table";
+import { messages } from "@/util/data";
 import Pagination from "../components/table/pagination-table";
-import FormationTable from "../components/table/formation/table";
+import MessagesTable from "../components/table/messages/table";
 
-export default function EventsPage() {
+export default function MessagesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
 
-  const filteredData = formations.filter((formation) => {
+  const filteredData = messages.filter((message) => {
     return (
-      formation.name.toLowerCase().includes(searchQuery.toLowerCase())
+      message.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
 
@@ -25,16 +23,10 @@ export default function EventsPage() {
   return (
     <div className="container px-2 py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Formations</h1>
-        <Link href="/admin/formations/add">
-          <Button>Ajouter une formation</Button>
-        </Link>
+        <h1 className="text-3xl font-bold">Messages</h1>
+        <Button>Marquer</Button>
       </div>
-      <SearchBar searchQuery={searchQuery} onSearchChange={(query) => {
-        setSearchQuery(query);
-        setCurrentPage(1);
-      }} />
-      <FormationTable formations={paginatedData} />
+      <MessagesTable messages={paginatedData} />
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
