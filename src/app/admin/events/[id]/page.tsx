@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon, BuildingIcon, EuroIcon, InfoIcon } from 'lucide-react'
 
-export default async function EventPage({ params }: { params: { id: string } }) {
+export default async function EventPage(params:any) {
   const collaboration = collaborations.find((c) => c.id === params.id)
 
   if (!collaboration) {

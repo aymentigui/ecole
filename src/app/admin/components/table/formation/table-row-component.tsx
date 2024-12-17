@@ -68,7 +68,7 @@ export default function TableRowComponent({ formation }: TableRowComponentProps)
             <Trash2 className="h-4 w-4" />
           </Button>
           {formation.isRegistrationAllowed && (
-            <Link href={`/admin/formations/client/${formation.id}`}>
+            <Link href={`/admin/clients/?id=${formation.id}&type=formation`}>
               <Button variant="ghost" size="icon">
                 <User className="h-4 w-4" />
               </Button>

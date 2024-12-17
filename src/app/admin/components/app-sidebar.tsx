@@ -89,7 +89,7 @@ const data = {
           url: "#",
         },
         {
-          title: "Limits",
+          title: "Admins",
           url: "#",
         },
       ],

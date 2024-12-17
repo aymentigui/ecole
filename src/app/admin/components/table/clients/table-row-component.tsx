@@ -53,7 +53,8 @@ export default function TableRowComponent({ inscription }: TableRowComponentProp
             {/* Select pour modifier le statut */}
             <select
               value={status}
-              onChange={(e) => {inscription.status=e.target.value;setStatus(e.target.value)}}
+              /* @ts-ignore*/
+              onChange={(e) => {  inscription.status=e.target.value;setStatus(e.target.value)}}
               className="border p-1 rounded"
             >
               <option value="pending">En attente</option>

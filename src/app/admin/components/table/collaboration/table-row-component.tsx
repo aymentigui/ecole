@@ -69,7 +69,7 @@ export default function TableRowComponent({ event }: TableRowComponentProps) {
             <Trash2 className="h-4 w-4" />
           </Button>
           {event.isRegistrationAllowed && (
-            <Link href={`/admin/events/client/${event.id}`}>
+            <Link href={`/admin/clients/?id=${event.id}&type=collaboration`}>
               <Button variant="ghost" size="icon">
                 <User className="h-4 w-4" />
               </Button>
