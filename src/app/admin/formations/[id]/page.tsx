@@ -5,9 +5,9 @@ import { fr } from 'date-fns/locale'
 import { formations } from '@/util/data'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon, BuildingIcon, EuroIcon, InfoIcon } from 'lucide-react'
+import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon,  EuroIcon, InfoIcon } from 'lucide-react'
 
-export default async function EventPage({ params }: { params: { id: string } }) {
+export default async function EventPage(params:any) {
   const formation = formations.find((c) => c.id === params.id)
 
   if (!formation) {
