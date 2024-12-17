@@ -6,6 +6,7 @@ import Pagination from "../components/table/pagination-table";
 import InscriptionsTable from "../components/table/clients/table";
 import SearchBar from "../components/table/searchBar-table";
 import { useSearchParams } from "next/navigation";
+import Loading from "./loading";
 
 export default function ClientsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,7 +46,7 @@ export default function ClientsPage() {
   }, [id, type]);
 
   return (
-    <Suspense>
+    <Suspense fallback={<Loading></Loading>}>
       <div className="container px-2 py-10">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Inscriptions</h1>
