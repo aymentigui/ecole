@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -13,65 +13,99 @@ import { ImageIcon as ImageLucide, Calendar, Building2, DollarSign, MapPin, Phon
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formationSchema } from '@/util/schema/formation'
+import { Formation } from '@/util/types'
+import { notFound, useParams } from 'next/navigation'
 
 type FormationFormValues = z.infer<typeof formationSchema>
 
-// Simuler le chargement des données de la formation
-const fetchEventData = async (id: string): Promise<FormationFormValues> => {
-  await new Promise(resolve => setTimeout(resolve, 1000)) // Simuler un délai réseau
-  return {
-    name: 'formation Exemple',
-    photo: '/logo.png' as string,
-    startDate: new Date('2023-12-01'),
-    endDate: new Date('2023-12-03'),
-    price: 100,
-    address: '123 Rue Exemple, Ville, Pays',
-    phone1: '0123456789',
-    phone2: '9876543210',
-    numberOfDays: 3,
-    numberOfHours: 24,
-    numberOfSessions: 6,
-    sessionDuration: 4,
-    remarks: 'Ceci est un exemple de remarques pour la formation.',
-    isRegistrationAllowed: true,
-  }
-}
 
 export default function EditEventPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
-  const params = use(paramsPromise);
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
 
+  const [formation, setFormation] = useState<Formation | null>(null);
+  const { id } = useParams()
   const form = useForm<FormationFormValues>({
     resolver: zodResolver(formationSchema),
-    defaultValues: async () => {
-      setIsLoading(true)
-      const data = await fetchEventData(params.id)
-      if(data.photo)
-        setPreviewImage(data.photo)
-      setIsLoading(false)
-      return data
-    },
   })
+
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`/api/formation?id=${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setFormation(data);
+    } catch (error) {
+      console.error("Error fetching formation:", error);
+      notFound()
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (form.formState.isDirty) {
       form.reset(form.getValues())
     }
-  }, [form])
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    if (formation) {
+      form.reset({
+        name: formation.name,
+        startDate: new Date(formation.startDate),
+        endDate: new Date(formation.endDate),
+        price: formation.price || 0,
+        address: formation.address || '',
+        phone1: formation.phone1 || '',
+        phone2: formation.phone2 || '',
+        numberOfDays: formation.numberOfDays || 1,
+        numberOfHours: formation.numberOfHours || 1,
+        numberOfSessions: formation.numberOfSessions || 1,
+        sessionDuration: formation.sessionDuration || 1,
+        remarks: formation.remarks || '',
+        isRegistrationAllowed: formation.isRegistrationAllowed || false,
+      });
+      if (formation.photo) {
+        setPreviewImage(formation.photo);
+      }
+    }
+  }, [formation]);
 
   async function onSubmit(data: FormationFormValues) {
     setIsSubmitting(true)
     try {
-      console.log(data)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      alert('Formation mis à jour avec succès !')
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la formation:', error)
-      alert('Une erreur est survenue lors de la mise à jour de la formation.')
+      const formData = new FormData()
+      const {photo,...jsonData} = data
+
+      if(photo)
+        formData.append('photo', photo)
+      formData.append('id', String(id))
+      formData.append('data', JSON.stringify(jsonData))
+
+      const response = await fetch('/api/formation', {
+        method: 'PUT',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur inconnue');
+      }
+  
+      await response.json();
+      alert('Formation modifiée avec succès !');
+    } catch (error:any) {
+      console.error('Erreur lors de la modification de la formation:', error);
+      alert(error.message || 'Une erreur est survenue lors de la modification de la formation.');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -81,14 +115,16 @@ export default function EditEventPage({ params: paramsPromise }: { params: Promi
       const reader = new FileReader()
       reader.onloadend = () => {
         setPreviewImage(reader.result as string)
-        form.setValue('photo', reader.result as string)
+        form.setValue('photo', e.target.files?.[0] as File)
       }
       reader.readAsDataURL(file)
     }
   }
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Chargement...</div>
+    <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+      </div>
   }
 
   return (

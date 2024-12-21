@@ -11,7 +11,11 @@ import { Footer } from './(public)/components/Footer'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 import { useMediaQuery } from '@mui/material';
 import Link from 'next/link'
-import { collaborations, formations } from '@/util/data'
+import loadingAnimation from "@/../public/loading.json";
+import Lottie from "react-lottie";
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
+
 
 const slides = [
   { image: '/slide1.png', text: 'Excellence académique' },
@@ -20,10 +24,50 @@ const slides = [
 ]
 
 export default function Home() {
+  const [collaborations, setCollaborations] = useState<any[]>([]);
+  const [isLoadingC, setIsLoadingC] = useState(true);
+  const [formations, setFormations] = useState<any[]>([]);
+  const [isLoadingF, setIsLoadingF] = useState(true);
+
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentIndexCollaboration, setCurrentIndexCollaboration] = useState(0);
   const [currentIndexFormation, setCurrentIndexFormation] = useState(0);
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    content: "",
+  });
+
+  const handleChange = (e:any) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e:any) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/api/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert("Message envoyé avec succès !");
+        setFormData({ name: "", email: "", content: "" }); // Réinitialise le formulaire
+      } else {
+        const errorData = await response.json();
+        alert(`Erreur : ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message :", error);
+      alert("Une erreur s'est produite. Veuillez réessayer.");
+    }
+  };
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,7 +76,7 @@ export default function Home() {
     const interval = setInterval(() => {
       handleNextCollaboration();
       handleNextFormation();
-    }, 3000);
+    }, 5000);
     return () => {
       clearInterval(timer);
       clearInterval(interval);
@@ -40,22 +84,30 @@ export default function Home() {
   }, [currentIndexCollaboration,currentIndexFormation])
 
   const handleNextCollaboration = () => {
+    if(collaborations.length<4)
+      return
     setCurrentIndexCollaboration((prevIndex) => (prevIndex + 1) % collaborations.length);
   };
 
   // Fonction pour aller au slide précédent
   const handlePrevCollaboration = () => {
+    if(collaborations.length<4)
+      return
     setCurrentIndexCollaboration((prevIndex) =>
       prevIndex === 0 ? collaborations.length - 1 : prevIndex - 1
     );
   };
 
   const handleNextFormation = () => {
+    if(formations.length<4)
+      return
     setCurrentIndexFormation((prevIndex) => (prevIndex + 1) % formations.length);
   };
 
   // Fonction pour aller au slide précédent
   const handlePrevFormation = () => {
+    if(formations.length<4)
+      return
     setCurrentIndexFormation((prevIndex) =>
       prevIndex === 0 ? formations.length - 1 : prevIndex - 1
     );
@@ -65,6 +117,15 @@ export default function Home() {
     if (isSmallScreen) {
       return [collaborations[currentIndexCollaboration],];
     }
+    if(collaborations.length<2)
+      return [
+        collaborations[currentIndexCollaboration],
+      ];
+    if(collaborations.length<3)
+      return [
+        collaborations[currentIndexCollaboration],
+        collaborations[(currentIndexCollaboration + 1) % collaborations.length],
+      ];
 
     return [
       collaborations[currentIndexCollaboration],
@@ -84,6 +145,41 @@ export default function Home() {
       formations[(currentIndexFormation + 1) % formations.length],
       formations[(currentIndexFormation + 2) % formations.length],
     ];
+  };
+
+  const fetchData = async () => {
+    try {
+      fetch("/api/public?queryType=recent-collaborations").then((response)=>{
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        response.json().then((data)=>setCollaborations(data))
+      });
+      fetch("/api/public?queryType=recent-formations").then((response)=>{
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        response.json().then((data)=>setFormations(data))
+      });
+    } catch (error) {
+      console.error("Error fetching collaborations:", error);
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsLoadingC(false);
+      setIsLoadingF(false);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const loadingOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: loadingAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
   };
 
   return (
@@ -109,69 +205,82 @@ export default function Home() {
         </section>
 
         {/* Collaborations Section */}
-        <section className="py-16 bg-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center mb-8">Nos dernières collaborations</h2>
-            <div className="relative">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <AnimatePresence>
-                  {getVisibleItemsCollaborations().map((collab, index) => (
-                    <motion.div
-                      key={index}
-                      className="bg-white flex flex-col items-center rounded-lg shadow-md overflow-hidden"
-                      initial={{ opacity: 0, y: 50 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -50 }}
-                      transition={{ duration: 0.5 }}
-                    ><Link href={`/collaborations/${collab.id}`}>
-                      {collab.photo && <Image
-                        src={collab.photo}
-                        quality={50}
-                        alt={collab.name}
-                        width={400}
-                        height={200}
-                        objectFit="cover"
-                      />}
-                      <div className="p-4">
-                        <h3 className="font-semibold text-xl mb-2">{collab.name}</h3>
-                        <p className="text-sm text-gray-600 italic mb-2">{collab.company}</p>
-                        <p className="text-sm text-gray-600 mb-2">
-                          Du {collab.startDate.toLocaleDateString()} au {collab.endDate.toLocaleDateString()}
-                        </p>
-                        <p className="font-bold text-lg mb-2">{collab.price + ".00 DA"}</p>
-                        <p>{collab.remarks}</p>
-                      </div>
-                    </Link>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-
-              {/* Boutons pour navigation */}
-              <button
-                onClick={handlePrevCollaboration}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600"
-              >
-                <FaArrowLeft />
-              </button>
-              <button
-                onClick={handleNextCollaboration}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600"
-              >
-                <FaArrowRight />
-              </button>
+        {
+          <section className={(collaborations && collaborations.length>0)?"py-16 bg-gray-100":"py-0 bg-gray-100"} >
+          {(isLoadingC )? (
+            <div className="flex justify-center items-center h-56">
+              {/* @ts-ignore */}
+              <Lottie options={loadingOptions} height={200} width={200} />
             </div>
-          </div>
+           ) : 
+           collaborations && collaborations.length>0 && (<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="text-3xl font-bold text-center mb-8">Nos dernières collaborations</h2>
+              <div className="relative">
+                <div className={(collaborations.length==1?"md:grid-cols-1":collaborations.length==2?"md:grid-cols-2":"md:grid-cols-3 ")+" grid grid-cols-1 gap-8"}>
+                  <AnimatePresence>
+                    {getVisibleItemsCollaborations().map((collab, index) => (
+                      <motion.div
+                        key={index}
+                        className="bg-white flex flex-col items-center rounded-lg shadow-md overflow-hidden"
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -50 }}
+                        transition={{ duration: 0.5 }}
+                      ><Link href={`/collaborations/${collab.id}`}>
+                        {collab.photo && <Image
+                          src={collab.photo}
+                          quality={50}
+                          alt={collab.name}
+                          width={300}
+                          className={""+(collaborations.length<3 && "w-full h-[300px] object-contain")}
+                          height={200}
+                        />}
+                        <div className={"p-4 "+(collaborations.length<3 && " text-center")}>
+                          <h3 className="font-semibold text-xl mb-2">{collab.name}</h3>
+                          <p className="text-sm text-gray-600 italic mb-2">{collab.company}</p>
+                          <p className="text-sm text-gray-600 mb-2">
+                          {`Du ${format(collab.startDate, 'dd MMMM yyyy', { locale: fr })} au ${format(collab.endDate, 'dd MMMM yyyy', { locale: fr })}`}
+                          </p>
+                          <p className="font-bold text-lg mb-2">{collab.price + ".00 DA"}</p>
+                          <p>{collab.remarks}</p>
+                        </div>
+                      </Link>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+
+                {/* Boutons pour navigation */}
+                <button
+                  onClick={handlePrevCollaboration}
+                  className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600"
+                >
+                  <FaArrowLeft />
+                </button>
+                <button
+                  onClick={handleNextCollaboration}
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600"
+                >
+                  <FaArrowRight />
+                </button>
+              </div>
+            </div>)
+          }
         </section>
-
-
+        }
 
         {/* Formations Section */}
-        <section className="py-16 bg-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className={(formations && formations.length>0)?"py-16 bg-gray-100":"py-0 bg-gray-100"} >
+          {(isLoadingC )? (
+            <div className="flex justify-center items-center h-56">
+              {/* @ts-ignore */}
+              <Lottie options={loadingOptions} height={200} width={200} />
+            </div>
+           ) : 
+           formations && formations.length>0 && (<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-8">Nos formations récentes</h2>
             <div className="relative">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className={(formations.length==1?"md:grid-cols-1":formations.length==2?"md:grid-cols-2":"md:grid-cols-3 ")+" grid grid-cols-1 gap-8"}>
                 <AnimatePresence>
                   {getVisibleItemsFormations().map((formation, index) => (
                     <motion.div
@@ -186,11 +295,11 @@ export default function Home() {
                         src={formation.photo}
                         quality={50}
                         alt={formation.name}
-                        width={400}
+                        width={300}
+                        className={""+(formations.length<3 && "w-full h-[300px] object-contain")}
                         height={200}
-                        objectFit="cover"
                       />}
-                      <div className="p-4">
+                      <div className={"p-4 "+(formations.length<3 && " text-center")}>
                         <h3 className="font-semibold text-xl mb-2">{formation.name}</h3>
                         <p className="text-sm text-gray-600 mb-2">
                           Du {formation.startDate.toLocaleDateString()} au {formation.endDate.toLocaleDateString()}
@@ -219,6 +328,7 @@ export default function Home() {
               </button>
             </div>
           </div>
+        )}
         </section>
 
         {/* About Section */}
@@ -237,11 +347,14 @@ export default function Home() {
         <section className="py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-8">Contactez-nous</h2>
-            <form className="space-y-4">
-              <Input type="text" placeholder="Nom" />
-              <Input type="email" placeholder="Email" />
-              <Textarea placeholder="Message" />
-              <Button type="submit" className="w-full">Envoyer</Button>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input type="text" name="name" placeholder="name" value={formData.name} onChange={handleChange} />
+              <Input
+                type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
+              <Textarea name="content" placeholder="content" value={formData.content} onChange={handleChange} />
+              <Button type="submit" className="w-full">
+                Envoyer
+              </Button>
             </form>
           </div>
         </section>

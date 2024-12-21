@@ -8,6 +8,7 @@ interface InscriptionsTableProps {
 }
 
 export default function InscriptionsTable({ inscriptions }: InscriptionsTableProps) {
+  
   return (
     <div className="rounded-lg border">
       <Table>

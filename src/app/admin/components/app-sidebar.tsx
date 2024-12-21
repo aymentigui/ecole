@@ -23,7 +23,7 @@ const data = {
   user: {
     name: "aymen",
     email: "aymentigui@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/logo.png",
   },
   navMain: [
     // {
@@ -78,15 +78,15 @@ const data = {
       items: [
         {
           title: "Général",
-          url: "#",
+          url: "/admin/settings/generale",
         },
         {
           title: "A propos",
-          url: "#",
+          url: "/admin/settings/about",
         },
         {
           title: "Adresses et contact",
-          url: "#",
+          url: "/admin/settings/contact",
         },
         {
           title: "Admins",

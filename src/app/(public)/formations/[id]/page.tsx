@@ -1,32 +1,56 @@
 "use client"
 
-import { useParams } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { formations } from "@/util/data"
 import { RegisterDialog } from "../../components/register-dialog"
 import { Navbar } from "../../components/Navbar"
 import { Footer } from "../../components/Footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon } from 'lucide-react'
+import { useEffect, useState } from "react"
+import { Formation } from "@prisma/client"
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 export default function FormationPage() {
   const { id } = useParams()
-  const formation = formations.find((c) => c.id === id)
+  const [isLoading, setIsLoading] = useState(true);
+  const [formation, setFormation] = useState<Formation | null>(null);
 
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`/api/formation?id=${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setFormation(data);
+    } catch (error) {
+      notFound()
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [id]);
+  
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
   if (!formation) {
-    return <div>Collaboration not found</div>
+    notFound()
   }
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("fr-FR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(date)
-  }
-
+  
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
       <Navbar />
@@ -57,7 +81,7 @@ export default function FormationPage() {
               <div className="flex flex-wrap items-center gap-4 mb-6">
                 <Badge variant="secondary" className="text-lg py-1 px-3">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formatDate(formation.startDate)} - {formatDate(formation.endDate)}
+                  {`${format(formation.startDate, 'dd MMMM yyyy', { locale: fr })} - ${format(formation.endDate, 'dd MMMM yyyy', { locale: fr })}`}
                 </Badge>
                 <Badge variant="destructive" className="text-lg py-1 px-3">
                   {formation.price} DA
@@ -119,7 +143,7 @@ export default function FormationPage() {
 
               {formation.isRegistrationAllowed && (
                 <div className="mt-8">
-                  <RegisterDialog />
+                  <RegisterDialog id={formation.id}/>
                 </div>
               )}
             </CardContent>

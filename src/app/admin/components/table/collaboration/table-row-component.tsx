@@ -6,12 +6,33 @@ import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2, User, Phone } from "lucide-react";
 import Link from "next/link";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useEffect } from "react";
 
 interface TableRowComponentProps {
   event: any;
+  onDlt:any
 }
 
-export default function TableRowComponent({ event }: TableRowComponentProps) {
+const FetchDelete= async (id:any,onDlt:any)=>{
+  const data={id:id}
+  const jsonData=await JSON.stringify(data)
+  const response = await fetch('/api/collaboration', {
+    method: 'DELETE',
+    body: jsonData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Erreur inconnue');
+  }
+
+  await response.json();
+  alert('Événement supprimé avec succès !');
+  onDlt()
+}
+
+export default function TableRowComponent({ event,onDlt }: TableRowComponentProps) {
+
   return (
     <TableRow
       className={
@@ -62,14 +83,14 @@ export default function TableRowComponent({ event }: TableRowComponentProps) {
             size="icon"
             onClick={() => {
               if (confirm("Êtes-vous sûr de vouloir supprimer cet événement ?")) {
-                console.log("Événement supprimé:", event.id);
+                FetchDelete(event.id,onDlt)
               }
             }}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
           {event.isRegistrationAllowed && (
-            <Link href={`/admin/clients/?id=${event.id}&type=collaboration`}>
+            <Link href={`/admin/clients/?id=${event.id}`}>
               <Button variant="ghost" size="icon">
                 <User className="h-4 w-4" />
               </Button>

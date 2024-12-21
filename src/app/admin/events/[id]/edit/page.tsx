@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -13,67 +13,97 @@ import { collaborationSchema } from '@/util/schema/events'
 import { ImageIcon as ImageLucide, Calendar, Building2, DollarSign, MapPin, Phone, Clock } from 'lucide-react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { notFound, useParams } from 'next/navigation'
+import { Collaboration } from '@/util/types'
 
 type EventFormValues = z.infer<typeof collaborationSchema>
 
-// Simuler le chargement des données de l'événement
-const fetchEventData = async (id: string): Promise<EventFormValues> => {
-  // Ici, vous feriez normalement un appel API pour récupérer les données de l'événement
-  await new Promise(resolve => setTimeout(resolve, 1000)) // Simuler un délai réseau
-  return {
-    name: 'Événement Exemple',
-    photo: '/logo.png' as string,
-    startDate: new Date('2023-12-01'),
-    endDate: new Date('2023-12-03'),
-    company: 'Entreprise ABC',
-    price: 100,
-    address: '123 Rue Exemple, Ville, Pays',
-    phone1: '0123456789',
-    phone2: '9876543210',
-    numberOfDays: 3,
-    numberOfHours: 24,
-    numberOfSessions: 6,
-    sessionDuration: 4,
-    remarks: 'Ceci est un exemple de remarques pour l\'événement.',
-    isRegistrationAllowed: true,
-  }
-}
-
-export default function EditEventPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
-  const params = use(paramsPromise);
+export default function EditEventPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
-
+  const [collaboration, setCollaboration] = useState<Collaboration | null>(null);
+  const { id } = useParams()
   const form = useForm<EventFormValues>({
     resolver: zodResolver(collaborationSchema),
-    defaultValues: async () => {
-      setIsLoading(true)
-      const data = await fetchEventData(params.id)
-      if(data.photo)
-        setPreviewImage(data.photo)
-      setIsLoading(false)
-      return data
-    },
   })
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`/api/collaboration?id=${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setCollaboration(data);
+    } catch (error) {
+      console.error("Error fetching collaboration:", error);
+      notFound()
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (form.formState.isDirty) {
       form.reset(form.getValues())
     }
-  }, [form])
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    if (collaboration) {
+      form.reset({
+        name: collaboration.name,
+        startDate: new Date(collaboration.startDate),
+        endDate: new Date(collaboration.endDate),
+        company: collaboration.company,
+        price: collaboration.price || 0,
+        address: collaboration.address || '',
+        phone1: collaboration.phone1 || '',
+        phone2: collaboration.phone2 || '',
+        numberOfDays: collaboration.numberOfDays || 1,
+        numberOfHours: collaboration.numberOfHours || 1,
+        numberOfSessions: collaboration.numberOfSessions || 1,
+        sessionDuration: collaboration.sessionDuration || 1,
+        remarks: collaboration.remarks || '',
+        isRegistrationAllowed: collaboration.isRegistrationAllowed || false,
+      });
+      if (collaboration.photo) {
+        setPreviewImage(collaboration.photo);
+      }
+    }
+  }, [collaboration]);
 
   async function onSubmit(data: EventFormValues) {
     setIsSubmitting(true)
     try {
-      console.log(data)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      alert('Événement mis à jour avec succès !')
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de l\'événement:', error)
-      alert('Une erreur est survenue lors de la mise à jour de l\'événement.')
+      const formData = new FormData()
+      const {photo,...jsonData} = data
+
+      if(photo)
+        formData.append('photo', photo)
+      formData.append('id', String(id))
+      formData.append('data', JSON.stringify(jsonData))
+
+      const response = await fetch('/api/collaboration', {
+        method: 'PUT',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur inconnue');
+      }
+  
+      await response.json();
+      alert('Événement modifié avec succès !');
+    } catch (error:any) {
+      console.error('Erreur lors de la modification de l\'événement:', error);
+      alert(error.message || 'Une erreur est survenue lors de la modification de l\'événement.');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -83,15 +113,22 @@ export default function EditEventPage({ params: paramsPromise }: { params: Promi
       const reader = new FileReader()
       reader.onloadend = () => {
         setPreviewImage(reader.result as string)
-        form.setValue('photo', reader.result as string)
+        form.setValue('photo', e.target.files?.[0] as File)
       }
       reader.readAsDataURL(file)
     }
   }
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Chargement...</div>
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+      </div>
+    );
   }
+
+  if(!collaboration)
+    notFound()
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
@@ -366,7 +403,18 @@ export default function EditEventPage({ params: paramsPromise }: { params: Promi
                   </FormItem>
                 )}
               />
-
+              {Object.keys(form.formState.errors).length > 0 && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-6">
+                    <h4 className="font-semibold">Erreurs détectées :</h4>
+                    <ul className="list-disc pl-5">
+                      {Object.entries(form.formState.errors).map(([field, error]) => (
+                        <li key={field}>
+                          <strong>{field}</strong> : {(error as any)?.message || 'Erreur non spécifiée'}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               <Button 
                 type="submit" 
                 disabled={isSubmitting}

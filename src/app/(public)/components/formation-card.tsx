@@ -2,6 +2,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Formation } from "@/util/types"
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 interface FormationCardProps {
   formation: Formation
@@ -23,7 +25,7 @@ export function FormationCard({ formation }: FormationCardProps) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-2">
-            Du {formation.startDate.toLocaleDateString()} au {formation.endDate.toLocaleDateString()}
+          {`Du ${format(formation.startDate, 'dd MMMM yyyy', { locale: fr })} au ${format(formation.endDate, 'dd MMMM yyyy', { locale: fr })}`}
           </p>
           <p className="font-bold text-lg mb-2">{formation.price} DA</p>
           <p className="text-sm text-muted-foreground">

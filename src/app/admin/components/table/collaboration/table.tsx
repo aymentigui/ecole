@@ -5,9 +5,10 @@ import TableRowComponent from "./table-row-component";
 
 interface EventsTableProps {
   events: any[];
+  onDlt:any
 }
 
-export default function EventsTable({ events }: EventsTableProps) {
+export default function EventsTable({ events,onDlt }: EventsTableProps) {
   return (
     <div className="rounded-lg border">
       <Table>
@@ -24,7 +25,7 @@ export default function EventsTable({ events }: EventsTableProps) {
         </TableHeader>
         <TableBody>
           {events.map((event) => (
-            <TableRowComponent key={event.id} event={event} />
+            <TableRowComponent key={event.id} event={event} onDlt={onDlt}  />
           ))}
         </TableBody>
       </Table>

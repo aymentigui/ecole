@@ -1,18 +1,51 @@
-import { notFound } from 'next/navigation'
+"use client"
+import { notFound, useParams} from 'next/navigation'
 import Image from 'next/image'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { collaborations } from '@/util/data'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon, BuildingIcon, EuroIcon, InfoIcon } from 'lucide-react'
+import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon, BuildingIcon, InfoIcon } from 'lucide-react'
+import { FaMoneyBill } from 'react-icons/fa6'
+import { useEffect, useState } from 'react'
+import { Collaboration } from '@/util/types'
 
-export default async function EventPage(params:any) {
-  const collaboration = collaborations.find((c) => c.id === params.id)
 
-  if (!collaboration) {
-    notFound()
+export default function EventPage() {
+  const [collaboration, setCollaboration] = useState<Collaboration | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { id } = useParams()
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`/api/collaboration?id=${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setCollaboration(data);
+    } catch (error) {
+      console.error("Error fetching collaboration:", error);
+      notFound()
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [id]);
+
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+      </div>
+    );
   }
+  if(!collaboration)
+    notFound()
 
   const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number | undefined }) => {
     if (value === undefined) return null;
@@ -58,9 +91,9 @@ export default async function EventPage(params:any) {
                   />
                 )}
                 <InfoItem
-                  icon={<EuroIcon className="w-5 h-5 text-green-500" />}
+                  icon={<FaMoneyBill className="w-5 h-5 text-green-500" />}
                   label="Prix"
-                  value={collaboration.price !== undefined ? `${collaboration.price} €` : undefined}
+                  value={collaboration.price !== undefined ? `${collaboration.price} DA` : undefined}
                 />
                 <InfoItem
                   icon={<MapPinIcon className="w-5 h-5 text-red-500" />}

@@ -24,7 +24,6 @@ export default function AddEventPage() {
     resolver: zodResolver(collaborationSchema),
     defaultValues: {
       name: '',
-      photo: '',
       startDate: new Date(),
       endDate: new Date(),
       company: '',
@@ -41,28 +40,47 @@ export default function AddEventPage() {
   })
 
   async function onSubmit(data: EventFormValues) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
+    
     try {
-      console.log(data)
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      alert('Événement ajouté avec succès !')
-      form.reset()
-      setPreviewImage(null)
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout de l\'événement:', error)
-      alert('Une erreur est survenue lors de l\'ajout de l\'événement.')
+      const formData = new FormData()
+      const {photo,...jsonData} = data
+      if(photo)
+        formData.append('photo', photo)
+      else 
+        throw new Error('Il faut ajouter une image');
+      formData.append('data', JSON.stringify(jsonData))
+
+      const response = await fetch('/api/collaboration', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur inconnue');
+      }
+  
+      await response.json();
+      alert('Événement ajouté avec succès !');
+      form.reset();
+      setPreviewImage(null);
+    } catch (error:any) {
+      console.error('Erreur lors de l\'ajout de l\'événement:', error);
+      alert(error.message || 'Une erreur est survenue lors de l\'ajout de l\'événement.');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
+  
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      form.setValue('photo', file); 
       const reader = new FileReader()
       reader.onloadend = () => {
         setPreviewImage(reader.result as string)
-        form.setValue('photo', reader.result as string)
       }
       reader.readAsDataURL(file)
     }
@@ -71,7 +89,7 @@ export default function AddEventPage() {
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
       <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6">
+        <CardHeader className="bg-gradient-to-r from-blue-900 to-blue-500 text-white p-6">
           <CardTitle className="text-3xl font-bold">Ajouter un événement</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -126,7 +144,7 @@ export default function AddEventPage() {
                       <ImageLucide size={48} />
                     </div>
                   )}
-                  <label className="flex items-center justify-center px-4 py-2 bg-purple-500 text-white rounded-md cursor-pointer hover:bg-purple-600 transition duration-300">
+                  <label className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-900 transition duration-300">
                     <span>Choisir une image</span>
                     <input
                       type="file"
@@ -148,7 +166,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -164,7 +182,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -183,7 +201,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input placeholder="Nom de la société" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input placeholder="Nom de la société" {...field} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -199,7 +217,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -217,7 +235,7 @@ export default function AddEventPage() {
                     <FormControl>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <Input placeholder="Adresse de l'événement" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                        <Input placeholder="Adresse de l'événement" {...field} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -235,7 +253,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input placeholder="0556772333" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input placeholder="0556772333" {...field} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -251,7 +269,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input placeholder="0556772333" {...field} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input placeholder="0556772333" {...field} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -270,7 +288,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10))} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -286,7 +304,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -302,7 +320,7 @@ export default function AddEventPage() {
                       <FormControl>
                         <div className="relative">
                           <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                          <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                          <Input type="number" {...field} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -320,7 +338,7 @@ export default function AddEventPage() {
                     <FormControl>
                       <div className="relative">
                         <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <Input type="number" step="0.5" {...field} onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-purple-500 rounded-md p-2" />
+                        <Input type="number" step="0.5" {...field} onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)} className="!pl-10 border-2 border-gray-300 focus:border-blue-500 rounded-md p-2" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -335,7 +353,7 @@ export default function AddEventPage() {
                   <FormItem>
                     <FormLabel className="text-lg font-semibold">Remarques (optionnel)</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Remarques supplémentaires" {...field} className="border-2 border-gray-300 focus:border-purple-500 rounded-md p-2 min-h-[100px]" />
+                      <Textarea placeholder="Remarques supplémentaires" {...field} className="border-2 border-gray-300 focus:border-blue-500 rounded-md p-2 min-h-[100px]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -345,10 +363,20 @@ export default function AddEventPage() {
               <Button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-md hover:from-purple-600 hover:to-pink-600 transition duration-300"
+                className="w-full bg-gradient-to-r from-blue-900 to-blue-500 text-white py-2 px-4 rounded-md hover:from-blue-600 hover:to-blue-600 transition duration-300"
               >
                 {isSubmitting ? 'Ajout en cours...' : 'Ajouter l\'événement'}
               </Button>
+              {Object.keys(form.formState.errors).length > 0 && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                  <strong className="font-bold">Erreurs de validation :</strong>
+                  <ul className="mt-2 ml-4 list-disc">
+                    {Object.entries(form.formState.errors).map(([key, error]) => (
+                      <li key={key}>{error.message}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </form>
           </Form>
         </CardContent>

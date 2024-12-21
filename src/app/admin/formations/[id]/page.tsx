@@ -1,14 +1,53 @@
-import { notFound } from 'next/navigation'
+"use client"
+import { notFound, useParams } from 'next/navigation'
 import Image from 'next/image'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { formations } from '@/util/data'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon,  EuroIcon, InfoIcon } from 'lucide-react'
+import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon,  InfoIcon } from 'lucide-react'
+import { formationSchema } from '@/util/schema/formation'
+import { z } from 'zod'
+import { FaMoneyBill } from 'react-icons/fa6'
+import { Formation } from '@/util/types'
+import { useEffect, useState } from 'react'
 
-export default async function EventPage(params:any) {
-  const formation = formations.find((c) => c.id === params.id)
+
+type FormationFormValues = z.infer<typeof formationSchema>
+
+
+export default function EventPage(params:any) {
+  const [formation, setFormation] = useState<Formation | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { id } = useParams()
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`/api/formation?id=${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setFormation(data);
+    } catch (error) {
+      console.error("Error fetching formation:", error);
+      notFound()
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [id]);
+
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   if (!formation) {
     notFound()
@@ -52,9 +91,9 @@ export default async function EventPage(params:any) {
                   />
                 )}
                 <InfoItem
-                  icon={<EuroIcon className="w-5 h-5 text-green-500" />}
+                  icon={<FaMoneyBill className="w-5 h-5 text-green-500" />}
                   label="Prix"
-                  value={formation.price !== undefined ? `${formation.price} €` : undefined}
+                  value={formation.price !== undefined ? `${formation.price} DA` : undefined}
                 />
                 <InfoItem
                   icon={<MapPinIcon className="w-5 h-5 text-red-500" />}
@@ -93,7 +132,7 @@ export default async function EventPage(params:any) {
                   value={formation.numberOfDays}
                 />
                 <InfoItem
-                  icon={<ClockIcon className="w-5 h-5 text-purple-500" />}
+                  icon={<ClockIcon className="w-5 h-5 text-blue-500" />}
                   label="Nombre d'heures"
                   value={formation.numberOfHours}
                 />
@@ -103,7 +142,7 @@ export default async function EventPage(params:any) {
                   value={formation.numberOfSessions}
                 />
                 <InfoItem
-                  icon={<ClockIcon className="w-5 h-5 text-purple-500" />}
+                  icon={<ClockIcon className="w-5 h-5 text-blue-500" />}
                   label="Durée de chaque séance"
                   value={formation.sessionDuration ? `${formation.sessionDuration} heures` : undefined}
                 />

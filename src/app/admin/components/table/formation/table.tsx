@@ -5,9 +5,10 @@ import TableRowComponent from "./table-row-component";
 
 interface FormationsTableProps {
   formations: any[];
+  onDlt:any;
 }
 
-export default function FormationTable({ formations }: FormationsTableProps) {
+export default function FormationTable({ formations,onDlt }: FormationsTableProps) {
   return (
     <div className="rounded-lg border">
       <Table>
@@ -23,7 +24,7 @@ export default function FormationTable({ formations }: FormationsTableProps) {
         </TableHeader>
         <TableBody>
           {formations.map((formation) => (
-            <TableRowComponent key={formation.id} formation={formation} />
+            <TableRowComponent key={formation.id} formation={formation} onDlt={onDlt} />
           ))}
         </TableBody>
       </Table>

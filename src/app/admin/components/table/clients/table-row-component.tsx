@@ -7,9 +7,8 @@ import { Eye } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { formations } from "@/util/data";
-import { collaborations } from "@/util/data";
 import { Inscription } from "@/util/types";
+import { updateStatusInscription } from "@/actions/requetes";
 
 interface TableRowComponentProps {
   inscription: Inscription
@@ -18,35 +17,38 @@ interface TableRowComponentProps {
 export default function TableRowComponent({ inscription }: TableRowComponentProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [status, setStatus] = useState(inscription.status);
+  
 
   const handleOpenDialog = () => setIsDialogOpen(true);
   const handleCloseDialog = () => setIsDialogOpen(false);
 
   // Récupérer le nom de la formation ou collaboration
-  const entityName =
-    inscription.entityType === "formation"
-      ? formations.find((f) => f.id === inscription.entityId)?.name || "Non trouvé"
-      : collaborations.find((c) => c.id === inscription.entityId)?.name || "Non trouvé";
+  const entityName = inscription.Formation.name 
 
-  const companyName =
-    inscription.entityType === "collaboration"
-      ? collaborations.find((c) => c.id === inscription.entityId)?.company || "Non spécifié"
-      : null;
+  const companyName = inscription.Formation.company || "Non spécifié"
+
+  const handlerChange= async (e:any)=>{
+    inscription.status=e.target.value;
+    setStatus(e.target.value)
+    const respone=await updateStatusInscription(inscription.id,e.target.value)
+    if(!respone.success)
+      alert(respone.error )
+  }
 
   return (
     <>
       <TableRow
       className={
-        inscription.status === "cancelled"
+        inscription.status === "annule"
           ? "bg-red-50 hover:bg-red-100"
-          : inscription.status === "confirmed"
+          : inscription.status === "confirme"
           ? "bg-green-50 hover:bg-green-100"
           : "hover:bg-slate-50"
       }>
-        <TableCell className="font-medium">{inscription.user.lastName}</TableCell>
-        <TableCell>{inscription.user.firstName}</TableCell>
-        <TableCell>{inscription.user.email}</TableCell>
-        <TableCell>{format(inscription.dateInscription, "dd/MM/yyyy")}</TableCell>
+        <TableCell className="font-medium">{inscription.nom}</TableCell>
+        <TableCell>{inscription.prenom}</TableCell>
+        <TableCell>{inscription.email}</TableCell>
+        <TableCell>{format(inscription.createdAt, "dd/MM/yyyy")}</TableCell>
         <TableCell>{entityName}</TableCell>
         <TableCell>
           <div className="flex space-x-2">
@@ -54,12 +56,12 @@ export default function TableRowComponent({ inscription }: TableRowComponentProp
             <select
               value={status}
               /* @ts-ignore*/
-              onChange={(e) => {  inscription.status=e.target.value;setStatus(e.target.value)}}
+              onChange={(e) => {  handlerChange(e)}}
               className="border p-1 rounded"
             >
-              <option value="pending">En attente</option>
-              <option value="confirmed">Confirmé</option>
-              <option value="cancelled">Annulé</option>
+              <option value="en attente">En attente</option>
+              <option value="confirme">Confirmé</option>
+              <option value="annule">Annulé</option>
             </select>
 
             {/* Bouton Voir */}
@@ -79,23 +81,29 @@ export default function TableRowComponent({ inscription }: TableRowComponentProp
           <div className="space-y-2">
             <p>
               <strong>Nom : </strong>
-              {inscription.user.lastName}
+              {inscription.nom}
             </p>
             <p>
               <strong>Prénom : </strong>
-              {inscription.user.firstName}
+              {inscription.prenom}
             </p>
             <p>
               <strong>Email : </strong>
-              {inscription.user.email}
+              {inscription.email}
             </p>
             <p>
               <strong>Date d'inscription : </strong>
-              {format(inscription.dateInscription, "dd/MM/yyyy")}
+              {format(inscription.createdAt, "dd/MM/yyyy")}
             </p>
+            {inscription.adresse && (
+              <p>
+                <strong>Adresse client : </strong>
+                {inscription.adresse }
+              </p>
+            )}
             <p>
               <strong>Type : </strong>
-              {inscription.entityType === "formation" ? "Formation" : "Collaboration"}
+              {(inscription.Formation.company === "" || inscription.Formation.company === null) ? "Formation" : "Collaboration"}
             </p>
             <p>
               <strong>Nom : </strong>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useParams } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { collaborations } from "@/util/data"
@@ -10,21 +10,46 @@ import { Footer } from "../../components/Footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CalendarIcon, MapPinIcon, PhoneIcon, ClockIcon } from 'lucide-react'
+import { useEffect, useState } from "react"
+import { Collaboration } from "@/util/types"
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 export default function CollaborationPage() {
   const { id } = useParams()
-  const collaboration = collaborations.find((c) => c.id === id)
+  const [isLoading, setIsLoading] = useState(true);
+  const [collaboration, setCollaboration] = useState<Collaboration | null>(null);
 
-  if (!collaboration) {
-    return <div>Collaboration not found</div>
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`/api/formation?id=${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setCollaboration(data);
+    } catch (error) {
+      notFound()
+    } finally {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [id]);
+  
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+      </div>
+    );
   }
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("fr-FR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(date)
+  if (!collaboration) {
+    notFound()
   }
 
   return (
@@ -60,7 +85,7 @@ export default function CollaborationPage() {
               <div className="flex flex-wrap items-center gap-4 mb-6">
                 <Badge variant="secondary" className="text-lg py-1 px-3">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formatDate(collaboration.startDate)} - {formatDate(collaboration.endDate)}
+                  {`${format(collaboration.startDate, 'dd MMMM yyyy', { locale: fr })} - ${format(collaboration.endDate, 'dd MMMM yyyy', { locale: fr })}`}
                 </Badge>
                 <Badge variant="destructive" className="text-lg py-1 px-3">
                   {collaboration.price} DA

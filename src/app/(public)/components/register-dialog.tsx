@@ -31,7 +31,7 @@ const formSchema = z.object({
   adresse: z.string().optional(),
 })
 
-export function RegisterDialog() {
+export function RegisterDialog(id:any) {
   const [open, setOpen] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,9 +45,31 @@ export function RegisterDialog() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    setOpen(false)
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const data={id:id.id,...values}
+      const jsonData=JSON.stringify(data)
+      const response = await fetch("/api/inscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonData,
+      });
+
+      if (response.ok) {
+        alert("Message envoyé avec succès !");
+        form.reset()
+        setOpen(false)
+      } else {
+        const errorData = await response.json();
+        alert(`Erreur : ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message :", error);
+      alert("Une erreur s'est produite. Veuillez réessayer.");
+    }finally{
+    }
   }
 
   return (

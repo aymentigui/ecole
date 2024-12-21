@@ -45,21 +45,18 @@ export interface Formation {
     open: boolean;
   }
 
-  export type UserInInscription = {
-    firstName: string;
-    lastName: string;
-    birthDate: Date;
-    phone: string;
-    email: string;
-    address?: string; // Optionnel
-  };
   
   export type Inscription = {
     id: string;
-    entityId: string;
-    entityType: "formation" | "collaboration";
-    dateInscription: Date;
-    status: "pending" | "confirmed" | "cancelled";
-    user: UserInInscription;
+    nom: String;
+    prenom: String;
+    dateNaissance:Date;
+    telephone: String;
+    email: String;
+    adresse?: String; // Optional
+    createdAt:Date;
+    updatedAt:Date;
+    status: "en attente" | "confirme" | "annule"; // Possible values: en attente, confirme, annule
+    Formation:Collaboration;
   };
   

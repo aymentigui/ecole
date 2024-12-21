@@ -12,7 +12,7 @@ export default function SearchBar({ searchQuery, onSearchChange }: SearchBarProp
     <div className="mb-6">
       <Input
         type="text"
-        placeholder="Rechercher un événement ou une société"
+        placeholder="Rechercher..."
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
         className="w-full"

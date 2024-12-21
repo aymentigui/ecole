@@ -2,6 +2,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Collaboration } from "@/util/types"
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 interface CollaborationCardProps {
   collaboration: Collaboration
@@ -26,7 +28,7 @@ export function CollaborationCard({ collaboration }: CollaborationCardProps) {
             Compagne : {collaboration.company}
           </p>
           <p className="text-sm text-muted-foreground mb-2">
-            Du {collaboration.startDate.toLocaleDateString()} au {collaboration.endDate.toLocaleDateString()}
+          {`Du ${format(collaboration.startDate, 'dd MMMM yyyy', { locale: fr })} au ${format(collaboration.endDate, 'dd MMMM yyyy', { locale: fr })}`}
           </p>
           <p className="font-bold text-lg mb-2">{collaboration.price} DA</p>
           <p className="text-sm text-muted-foreground">

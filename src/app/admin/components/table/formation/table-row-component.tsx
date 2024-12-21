@@ -9,9 +9,27 @@ import { TableCell, TableRow } from "@/components/ui/table";
 
 interface TableRowComponentProps {
   formation: any;
+  onDlt:any;
+}
+const FetchDelete= async (id:any,onDlt:any)=>{
+  const data={id:id}
+  const jsonData=await JSON.stringify(data)
+  const response = await fetch('/api/collaboration', {
+    method: 'DELETE',
+    body: jsonData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Erreur inconnue');
+  }
+
+  await response.json();
+  alert('Événement supprimé avec succès !');
+  onDlt()
 }
 
-export default function TableRowComponent({ formation }: TableRowComponentProps) {
+export default function TableRowComponent({ formation,onDlt }: TableRowComponentProps) {
   return (
     <TableRow
       className={
@@ -61,14 +79,14 @@ export default function TableRowComponent({ formation }: TableRowComponentProps)
             size="icon"
             onClick={() => {
               if (confirm("Êtes-vous sûr de vouloir supprimer cette formation ?")) {
-                console.log("Formation supprimé:", formation.id);
+                FetchDelete(formation.id,onDlt)
               }
             }}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
           {formation.isRegistrationAllowed && (
-            <Link href={`/admin/clients/?id=${formation.id}&type=formation`}>
+            <Link href={`/admin/clients/?id=${formation.id}`}>
               <Button variant="ghost" size="icon">
                 <User className="h-4 w-4" />
               </Button>
