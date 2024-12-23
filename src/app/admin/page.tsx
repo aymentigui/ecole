@@ -1,23 +1,16 @@
-import { auth, signOut } from '@/auth'
-import { Button } from '@/components/ui/button'
-import React from 'react'
+"use client"
+import { useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
 
-const Admin = async () => {
-  const session=await auth()
-  console.log(JSON.stringify(session))
+const Admin =  () => {
+  const route=useRouter()
+  useEffect(()=>{
+    route.push("/admin/clients")
+  },[])
   
   return (
     <div>
-        <form action={
-          async ()=>{
-            "use server"
-            await signOut()
-          }
-        }>
-          <Button type='submit'>
-            Deconnecter
-          </Button>
-        </form>
+        
     </div>
   )
 }
