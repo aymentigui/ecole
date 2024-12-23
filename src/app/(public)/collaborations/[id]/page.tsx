@@ -3,7 +3,6 @@
 import { notFound, useParams } from "next/navigation"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { collaborations } from "@/util/data"
 import { RegisterDialog } from "../../components/register-dialog"
 import { Navbar } from "../../components/Navbar"
 import { Footer } from "../../components/Footer"

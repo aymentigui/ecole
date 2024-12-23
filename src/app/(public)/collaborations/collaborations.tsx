@@ -5,7 +5,9 @@ import { motion } from "framer-motion"
 import { Input } from "@/components/ui/input"
 import { CollaborationCard } from "../components/collaboration-card"
 import loadingAnimation from "@/../public/loading.json";
-import Lottie from "react-lottie";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('react-lottie'), { ssr: false });
+import { allCollaborations } from "@/actions/requetes"
 
 export function CollaborationsContent() {
   const [search, setSearch] = useState("")
@@ -17,12 +19,9 @@ export function CollaborationsContent() {
   )
   const fetchData = async () => {
     try {
-      const response = await fetch("/api/public?queryType=all-collaborations");
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json();
-      setCollaborations(data);
+      const responce = await allCollaborations();
+      if(responce.success)
+        setCollaborations(responce.data);
     } catch (error) {
       console.error("Error fetching collaborations:", error);
     } finally {

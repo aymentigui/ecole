@@ -7,15 +7,15 @@ import SearchBar from "../components/table/searchBar-table";
 import { useSearchParams } from "next/navigation";
 import { Inscription } from "@/util/types";
 import loadingAnimation from "@/../public/loading.json";
-import Lottie from "react-lottie";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('react-lottie'), { ssr: false });
 
-export default function ClientsPage() {
+export default function ClientsPage(props:any) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const itemsPerPage = 30;
-  const searchParams = useSearchParams(); 
-  const id = searchParams.get("id") 
+  const id = props.params.id 
   const [inscriptions, setInscriptions] = useState<Inscription[]>([]);
 
   const filteredByUrlParams = inscriptions.filter((inscription) => {

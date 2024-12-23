@@ -5,7 +5,9 @@ import { motion } from "framer-motion"
 import { Input } from "@/components/ui/input"
 import { FormationCard } from "../components/formation-card"
 import loadingAnimation from "@/../public/loading.json";
-import Lottie from "react-lottie";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('react-lottie'), { ssr: false });
+import { allFormations } from "@/actions/requetes"
 
 export function FormationsContent() {
   const [search, setSearch] = useState("")
@@ -18,12 +20,9 @@ export function FormationsContent() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("/api/public?queryType=all-formations");
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json();
-      setFormations(data);
+      const responce = await allFormations();
+      if(responce.success)
+        setFormations(responce.data);
     } catch (error) {
       console.error("Error fetching collaborations:", error);
     } finally {

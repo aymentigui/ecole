@@ -6,7 +6,8 @@ import Pagination from "../components/table/pagination-table";
 import MessagesTable from "../components/table/messages/table";
 import { Message } from "@/util/types";
 import loadingAnimation from "@/../public/loading.json";
-import Lottie from "react-lottie";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('react-lottie'), { ssr: false });
 import SearchBar from "../components/table/searchBar-table";
 
 export default function MessagesPage() {

@@ -12,15 +12,18 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6'
 import { useMediaQuery } from '@mui/material';
 import Link from 'next/link'
 import loadingAnimation from "@/../public/loading.json";
-import Lottie from "react-lottie";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('react-lottie'), { ssr: false });
 import { format } from 'date-fns'
 import { da, fr } from 'date-fns/locale'
 import { getAboutSettings, getGeneralSettings } from '@/actions/settings'
+import { recentcollaborations, recentFormations } from '@/actions/requetes'
 
 
 
 export default function Home() {
   const [collaborations, setCollaborations] = useState<any[]>([]);
+  const [isLottie, setIsLottie] = useState(false);
   const [isLoadingC, setIsLoadingC] = useState(true);
   const [formations, setFormations] = useState<any[]>([]);
   const [isLoadingF, setIsLoadingF] = useState(true);
@@ -28,9 +31,9 @@ export default function Home() {
               Nous nous efforçons de préparer nos étudiants aux défis du monde professionnel en leur offrant 
               des formations innovantes et adaptées aux besoins du marché.`)
   const [slides,setSlides]=useState([
-    { image: '/slide1.png', text: 'Excellence académique' },
-    { image: '/slide2.png', text: 'Innovation pédagogique' },
-    { image: '/slide3.png', text: 'Accompagnement personnalisé' },
+    { image: '/slice1.png', text: 'Excellence académique' },
+    { image: '/slice2.png', text: 'Innovation pédagogique' },
+    { image: '/slice3.png', text: 'Accompagnement personnalisé' },
   ])
 
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -163,17 +166,13 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      fetch("/api/public?queryType=recent-collaborations").then((response)=>{
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        response.json().then((data)=>setCollaborations(data))
+      recentcollaborations().then((response)=>{
+        if(response.success)
+          setCollaborations(response.data)
       });
-      fetch("/api/public?queryType=recent-formations").then((response)=>{
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        response.json().then((data)=>setFormations(data))
+      recentFormations().then((response)=>{
+        if(response.success)
+          setFormations(response.data)
       });
     } catch (error) {
       console.error("Error fetching collaborations:", error);
@@ -184,6 +183,7 @@ export default function Home() {
     }
   };
   useEffect(() => {
+    setIsLottie(true)
     fetchData();
   }, []);
 
@@ -223,8 +223,7 @@ export default function Home() {
           <section className={(collaborations && collaborations.length>0)?"py-16 bg-gray-100":"py-0 bg-gray-100"} >
           {(isLoadingC )? (
             <div className="flex justify-center items-center h-56">
-              {/* @ts-ignore */}
-              <Lottie options={loadingOptions} height={200} width={200} />
+              {isLottie && <Lottie options={loadingOptions} height={200} width={200} />}
             </div>
            ) : 
            collaborations && collaborations.length>0 && (<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -285,10 +284,10 @@ export default function Home() {
 
         {/* Formations Section */}
         <section className={(formations && formations.length>0)?"py-16 bg-gray-100":"py-0 bg-gray-100"} >
-          {(isLoadingC )? (
+          {(isLoadingF )? (
             <div className="flex justify-center items-center h-56">
               {/* @ts-ignore */}
-              <Lottie options={loadingOptions} height={200} width={200} />
+              {isLottie && <Lottie options={loadingOptions} height={200} width={200} />}
             </div>
            ) : 
            formations && formations.length>0 && (<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

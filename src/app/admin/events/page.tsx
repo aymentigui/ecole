@@ -7,7 +7,8 @@ import SearchBar from "../components/table/searchBar-table";
 import EventsTable from "../components/table/collaboration/table";
 import Pagination from "../components/table/pagination-table";
 import { Collaboration } from "@/util/types";
-import Lottie from "react-lottie";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('react-lottie'), { ssr: false });
 import loadingAnimation from "@/../public/loading.json";
 
 

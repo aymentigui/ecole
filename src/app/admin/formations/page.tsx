@@ -8,7 +8,8 @@ import Pagination from "../components/table/pagination-table";
 import FormationTable from "../components/table/formation/table";
 import { Formation } from "@/util/types";
 import loadingAnimation from "@/../public/loading.json";
-import Lottie from "react-lottie";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('react-lottie'), { ssr: false });
 
 export default function EventsPage() {
   const [currentPage, setCurrentPage] = useState(1);

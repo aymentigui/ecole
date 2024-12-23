@@ -363,5 +363,3 @@ export async function getUsers() {
         logoUrl: '/logo.png',
       }
   }
-  
-  
