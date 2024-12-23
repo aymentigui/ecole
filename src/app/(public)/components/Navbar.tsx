@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +9,9 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { LogoComponent } from './logo';
+import { useEffect, useState } from 'react';
+import { getGeneralSettings } from '@/actions/settings';
 
 const navItems = [
   { name: 'Accueil', href: '/' },
@@ -21,6 +23,13 @@ const navItems = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const [title,setTitlte]=useState("École de Formation")
+
+  useEffect(()=>{
+    getGeneralSettings().then(data=>{
+      setTitlte(p=>(data.siteName??p))
+    })
+  },[])
 
   return (
     <nav className="bg-white shadow-lg">
@@ -28,9 +37,9 @@ export function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex-shrink-0 flex items-center">
             <Link href="/">
-              <Image src="/logo.png" alt="Logo" width={40} height={40} />
+              <LogoComponent/>
             </Link>
-            <span className="ml-2 text-xl font-bold">École de Formation</span>
+            <span className="ml-2 text-xl font-bold">{title}</span>
           </div>
           <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => (

@@ -5,6 +5,8 @@ import { randomBytes } from 'crypto'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 import fs from 'fs/promises';
+import bcrypt from "bcrypt";
+import { auth } from '@/auth'
 
 export async function updateSiteName(name: string) {
 const record = await prisma.option.findUnique({
@@ -301,3 +303,65 @@ export async function getContactSettings() {
   }
 }
 
+export async function getUsers() {
+    const users = await prisma.user.findMany({
+      where: {
+        default: false
+      },
+      select: {
+        id: true,
+        email: true
+      }
+    })
+    return users
+  }
+  
+  export async function updateUserEmail(id: string, newEmail: string) {
+    await prisma.user.update({
+      where: { id },
+      data: { email: newEmail }
+    })
+  }
+  
+  export async function deleteUser(id: string) {
+    await prisma.user.delete({
+      where: { id }
+    })
+  }
+  
+  export async function addUser(email: string, password: string) {
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        default: false
+      },
+      select: {
+        id: true,
+        email: true
+      }
+    })
+    return newUser
+  }
+
+  export async function getUserLogin() {
+    const session=await auth()
+    if(session && session.user)
+        return {email:session.user.email, name:session.user?.name}
+    return null
+  }
+
+ export async function getLogoURL() {
+    const options = await prisma.option.findFirst({
+        where: { id: '1' },
+        select: {
+          logoUrl: true,
+        },
+      })
+      return options || {
+        logoUrl: '/logo.png',
+      }
+  }
+  
+  

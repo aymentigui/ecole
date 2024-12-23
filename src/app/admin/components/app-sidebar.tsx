@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
   CalendarClock,
   UsersRound,
@@ -17,14 +16,11 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { NavClient } from "./nav-client"
+import { useEffect, useState } from "react"
+import { getLogoURL, getUserLogin } from "@/actions/settings"
 
 // This is sample data.
 const data = {
-  user: {
-    name: "aymen",
-    email: "aymentigui@gmail.com",
-    avatar: "/logo.png",
-  },
   navMain: [
     // {
     //   title: "Playground",
@@ -90,7 +86,7 @@ const data = {
         },
         {
           title: "Admins",
-          url: "#",
+          url: "/admin/settings/admin",
         },
       ],
     },
@@ -98,6 +94,19 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  
+  const [user,setUser]=useState({name:"",email:"",avatar:"/logo.png"})
+  useEffect(()=> {
+    getUserLogin().then((user)=>{
+      if(user)
+        setUser(p=>({...p,email:user.email??""}))
+    })
+    getLogoURL().then((logo)=>{
+      if(logo && logo.logoUrl)
+        setUser(p=>({...p,avatar:logo.logoUrl??"/logo.png"}))
+    })
+  },[])
+
   return (
     <Sidebar collapsible="icon" {...props}>
 
@@ -108,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain title="Reglage" items={data.navSetting} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

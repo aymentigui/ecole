@@ -11,7 +11,7 @@ export default auth((req)=> {
     const isLogging = !!req.auth; // Vérifie si l'utilisateur est connecté
 
     const isApiAuthRoutes = nextUrl.pathname.startsWith(apiAuthPrefix);
-    const isPublicRoutes = publicRoutes.includes(nextUrl.pathname);
+    const isPublicRoutes = publicRoutes.some((route) => nextUrl.pathname.startsWith(route)) ||  nextUrl.pathname=="/";
     const isAuthRoutes = authRoutes.includes(nextUrl.pathname);
     
     

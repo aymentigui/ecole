@@ -14,20 +14,24 @@ import Link from 'next/link'
 import loadingAnimation from "@/../public/loading.json";
 import Lottie from "react-lottie";
 import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import { da, fr } from 'date-fns/locale'
+import { getAboutSettings, getGeneralSettings } from '@/actions/settings'
 
 
-const slides = [
-  { image: '/slide1.png', text: 'Excellence académique' },
-  { image: '/slide2.png', text: 'Innovation pédagogique' },
-  { image: '/slide3.png', text: 'Accompagnement personnalisé' },
-]
 
 export default function Home() {
   const [collaborations, setCollaborations] = useState<any[]>([]);
   const [isLoadingC, setIsLoadingC] = useState(true);
   const [formations, setFormations] = useState<any[]>([]);
   const [isLoadingF, setIsLoadingF] = useState(true);
+  const [about,setAbout]=useState(`Notre école de formation s'engage à fournir une éducation de qualité depuis plus de 20 ans. 
+              Nous nous efforçons de préparer nos étudiants aux défis du monde professionnel en leur offrant 
+              des formations innovantes et adaptées aux besoins du marché.`)
+  const [slides,setSlides]=useState([
+    { image: '/slide1.png', text: 'Excellence académique' },
+    { image: '/slide2.png', text: 'Innovation pédagogique' },
+    { image: '/slide3.png', text: 'Accompagnement personnalisé' },
+  ])
 
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentIndexCollaboration, setCurrentIndexCollaboration] = useState(0);
@@ -70,6 +74,16 @@ export default function Home() {
 
 
   useEffect(() => {
+    getGeneralSettings().then((data)=>{
+      setSlides((p)=>([
+        {image:data.slice1Url??p[0].image,text:p[0].text},
+        {image:data.slice2Url??p[1].image,text:p[1].text},
+        {image:data.slice3Url??p[2].image,text:p[2].text},
+      ]))
+    })
+    getAboutSettings().then((data)=>{
+      setAbout(p=>(data.siteDescription??p))
+    })
     const timer = setInterval(() => {
       setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length)
     }, 5000)
@@ -336,9 +350,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-8">À propos de notre école</h2>
             <p className="text-lg text-center mb-8">
-              {`Notre école de formation s'engage à fournir une éducation de qualité depuis plus de 20 ans. 
-              Nous nous efforçons de préparer nos étudiants aux défis du monde professionnel en leur offrant 
-              des formations innovantes et adaptées aux besoins du marché.`}
+              {about}
             </p>
           </div>
         </section>

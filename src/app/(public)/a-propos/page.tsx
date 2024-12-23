@@ -4,8 +4,20 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'  
 import { Footer } from '../components/Footer'
 import { Navbar } from '../components/Navbar'
+import { useEffect, useState } from 'react'
+import { getAboutSettings } from '@/actions/settings'
 
 export default function About() {
+  const [about,setAbout]=useState(`Fondée il y a plus de 20 ans, notre école de formation s'est toujours efforcée de fournir une éducation de qualité et innovante. Nous avons commencé avec une petite équipe passionnée et avons grandi pour devenir l'un des leaders de la formation professionnelle en France.
+                          Notre mission est de préparer nos étudiants aux défis du monde professionnel en leur offrant des formations adaptées aux besoins du marché et en constante évolution.`)
+  
+  const [image,setImage]=useState<undefined|string>()
+  useEffect(()=>{
+    getAboutSettings().then((data)=>{
+      setAbout((p)=>data.siteDescription??about)
+      setImage(p=>(data.descriptionImageUrl??"/formation.png"))
+    })
+  },[])
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -25,7 +37,7 @@ export default function About() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <Image src="/formation.png" alt="Notre école" width={600} height={400} className="rounded-lg h-[350px] object-cover object-top" />
+              {image && <Image src={image} alt="Notre école" width={600} height={400} className="rounded-lg h-[350px] object-cover object-top" />}
             </motion.div>
             <motion.div
               initial={{ opacity: 0, x: 50 }}
@@ -33,11 +45,8 @@ export default function About() {
               transition={{ delay: 0.4, duration: 0.5 }}
             >
               <h2 className="text-2xl font-semibold mb-4">Notre histoire</h2>
-              <p className="mb-4">
-                {"Fondée il y a plus de 20 ans, notre école de formation s'est toujours efforcée de fournir une éducation de qualité et innovante. Nous avons commencé avec une petite équipe passionnée et avons grandi pour devenir l'un des leaders de la formation professionnelle en France."}
-              </p>
-              <p>
-                {"Notre mission est de préparer nos étudiants aux défis du monde professionnel en leur offrant des formations adaptées aux besoins du marché et en constante évolution."}
+              <p className="mb-4 leading-8">
+                {about}
               </p>
             </motion.div>
           </div>

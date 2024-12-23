@@ -12,7 +12,7 @@ export const allFormations = async (): Promise<
             where: {
                 typeFormation: 1,
                 startDate: {
-                    lt: new Date(),
+                    gte: new Date(),
                 },
             },
             orderBy: {
@@ -33,7 +33,7 @@ export const allCollaborations = async (): Promise<
             where: {
                 typeFormation: 2,
                 startDate: {
-                    lt: new Date(),
+                  gte: new Date(),
                 },
             },
             orderBy: {
